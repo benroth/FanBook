@@ -33,10 +33,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
             this.webBrowser1 = new System.Windows.Forms.WebBrowser();
-            this.button2 = new System.Windows.Forms.Button();
-            this.label4 = new System.Windows.Forms.Label();
+            this.btnDownloadStory = new System.Windows.Forms.Button();
+            this.lblProgressText = new System.Windows.Forms.Label();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.button3 = new System.Windows.Forms.Button();
+            this.btnSaveStory = new System.Windows.Forms.Button();
+            this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
             // textBox1
@@ -83,24 +84,24 @@
             this.webBrowser1.Size = new System.Drawing.Size(628, 483);
             this.webBrowser1.TabIndex = 5;
             // 
-            // button2
+            // btnDownloadStory
             // 
-            this.button2.Enabled = false;
-            this.button2.Location = new System.Drawing.Point(15, 545);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(90, 23);
-            this.button2.TabIndex = 8;
-            this.button2.Text = "Download Story";
-            this.button2.UseVisualStyleBackColor = true;
-            this.button2.Click += new System.EventHandler(this.button2_Click);
+            this.btnDownloadStory.Enabled = false;
+            this.btnDownloadStory.Location = new System.Drawing.Point(15, 545);
+            this.btnDownloadStory.Name = "btnDownloadStory";
+            this.btnDownloadStory.Size = new System.Drawing.Size(90, 23);
+            this.btnDownloadStory.TabIndex = 8;
+            this.btnDownloadStory.Text = "Download Story";
+            this.btnDownloadStory.UseVisualStyleBackColor = true;
+            this.btnDownloadStory.Click += new System.EventHandler(this.button2_Click);
             // 
-            // label4
+            // lblProgressText
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(494, 550);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(0, 13);
-            this.label4.TabIndex = 10;
+            this.lblProgressText.AutoSize = true;
+            this.lblProgressText.Location = new System.Drawing.Point(494, 550);
+            this.lblProgressText.Name = "lblProgressText";
+            this.lblProgressText.Size = new System.Drawing.Size(0, 13);
+            this.lblProgressText.TabIndex = 10;
             // 
             // saveFileDialog1
             // 
@@ -108,25 +109,32 @@
             this.saveFileDialog1.Filter = "Web Page (*.htm;*.html)|*.htm;*.html|All files(*.*)|*.*\"";
             this.saveFileDialog1.FileOk += new System.ComponentModel.CancelEventHandler(this.saveFileDialog1_FileOk);
             // 
-            // button3
+            // btnSaveStory
             // 
-            this.button3.Enabled = false;
-            this.button3.Location = new System.Drawing.Point(256, 545);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(75, 23);
-            this.button3.TabIndex = 11;
-            this.button3.Text = "Save Story";
-            this.button3.UseVisualStyleBackColor = true;
-            this.button3.Click += new System.EventHandler(this.button3_Click_1);
+            this.btnSaveStory.Enabled = false;
+            this.btnSaveStory.Location = new System.Drawing.Point(256, 545);
+            this.btnSaveStory.Name = "btnSaveStory";
+            this.btnSaveStory.Size = new System.Drawing.Size(75, 23);
+            this.btnSaveStory.TabIndex = 11;
+            this.btnSaveStory.Text = "Save Story";
+            this.btnSaveStory.UseVisualStyleBackColor = true;
+            this.btnSaveStory.Click += new System.EventHandler(this.button3_Click_1);
+            // 
+            // backgroundWorker1
+            // 
+            this.backgroundWorker1.WorkerReportsProgress = true;
+            this.backgroundWorker1.DoWork += new System.ComponentModel.DoWorkEventHandler(this.backgroundWorker1_DoWork);
+            this.backgroundWorker1.ProgressChanged += new System.ComponentModel.ProgressChangedEventHandler(this.backgroundWorker1_ProgressChanged);
+            this.backgroundWorker1.RunWorkerCompleted += new System.ComponentModel.RunWorkerCompletedEventHandler(this.backgroundWorker1_RunWorkerCompleted);
             // 
             // form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(655, 580);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.label4);
-            this.Controls.Add(this.button2);
+            this.Controls.Add(this.btnSaveStory);
+            this.Controls.Add(this.lblProgressText);
+            this.Controls.Add(this.btnDownloadStory);
             this.Controls.Add(this.webBrowser1);
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label2);
@@ -146,10 +154,11 @@
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;
         private System.Windows.Forms.WebBrowser webBrowser1;
-        private System.Windows.Forms.Button button2;
-        private System.Windows.Forms.Label label4;
+        private System.Windows.Forms.Button btnDownloadStory;
+        private System.Windows.Forms.Label lblProgressText;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
-        private System.Windows.Forms.Button button3;
+        private System.Windows.Forms.Button btnSaveStory;
+        private System.ComponentModel.BackgroundWorker backgroundWorker1;
     }
 }
 
