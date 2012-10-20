@@ -16,7 +16,7 @@ namespace fBook
     public class FanBook
     {
         private ushort storyChapters;
-        private string storyURL, storyTitle, authorName, storyStatus, storyWords, storyPublished, storyUpdated;
+        private string storyURL, storyTitle, authorName, authorLink, storySummary, storyStatus, storyWords, storyPublished, storyUpdated, storyBody;
         private List<string> chapterTitles = new List<string>();
         private StringBuilder storyContent = new StringBuilder();
         private StringBuilder storyInfo = new StringBuilder();
@@ -26,11 +26,14 @@ namespace fBook
             storyChapters = 0;
             storyURL = null;
             storyTitle = null;
+            storySummary = null;
             authorName = null;
+            authorLink = null;
             storyStatus = null;
             storyWords = null;
             storyPublished = null;
             storyUpdated = null;
+            storyBody = null;
             chapterTitles.Clear();
             storyContent.Clear();
             storyInfo.Clear();
@@ -46,7 +49,7 @@ namespace fBook
             {
                 storyURL = "http://" + storyURL;
             }
-            if (!storyURL.Contains("fanfiction.net") && !storyURL.Contains("fictionpress.com"))
+            if (!storyURL.Contains("fanfiction.net") && !storyURL.Contains("fictionpress.com") && !storyURL.Contains("tthfanfic.org"))
             {
                 return "Invalid URL! Please enter URLs for fanfiction.net or fictionpress.com stories only.";
             }
@@ -70,8 +73,10 @@ namespace fBook
                 string[] addressParts = storyURL.Split('/');
                 if (storyURL.Contains("fanfiction.net"))
                     storyURL = "http://www.fanfiction.net/s/" + addressParts[4];
-                else
+                else if (storyURL.Contains("fictionpress.com"))
                     storyURL = "http://www.fictionpress.com/s/" + addressParts[4];
+                else
+                    storyURL = "http://www.tthfanfic.org/" + addressParts[3];
                 //Sets the storyURL to the base URL for whichever site plus the storyID.
                 return "Download test passed.";
             }
@@ -111,12 +116,16 @@ namespace fBook
         { //Downloads first chapter to get story info.
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(grabHtml(storyURL));
-            GrabStoryVariables(doc);
-            CreateStoryHeader(doc);
+            if (storyURL.Contains("fanfiction.net") || storyURL.Contains("fictionpress.com"))
+                GrabStoryVariablesFFNET(doc);
+            if (storyURL.Contains("tthfanfic.org"))
+                GrabStoryVariablesTTHFanfic(doc);
+            //GrabStoryVariables(doc);
+            CreateStoryHeader();
             return storyInfo.ToString();
         }
 
-        private void GrabStoryVariables(HtmlAgilityPack.HtmlDocument doc)
+        private void GrabStoryVariablesFFNET(HtmlAgilityPack.HtmlDocument doc)
         {//Takes first chapter and fills story variables with its info.
             try { storyChapters = (ushort)(doc.DocumentNode.SelectNodes("//select[@id='chap_select']/option").Count() / 2); }
             catch { storyChapters = 1; }
@@ -124,6 +133,9 @@ namespace fBook
 
             storyTitle = doc.DocumentNode.SelectSingleNode("//tr[@class='alt2']//b").InnerText;
             authorName = doc.DocumentNode.SelectSingleNode("//a[contains(@href, '/u/')]").InnerText;
+            authorLink = doc.DocumentNode.SelectSingleNode("//a[contains(@href, '/u/')]").OuterHtml;
+            authorLink = authorLink.Insert(9, "http://www.fanfiction.net");
+            storySummary = doc.DocumentNode.SelectSingleNode("//div[@style='margin-top:2px']").InnerText;
             string greyHeader = doc.DocumentNode.SelectSingleNode("//div[@style='color:gray;']").InnerText;
             string[] splitHeader = greyHeader.Split(' ');
             //Grabs individual variables from story, then splits header up for further parsing.
@@ -148,20 +160,58 @@ namespace fBook
                 foreach (HtmlNode node in doc.DocumentNode.SelectNodes("//select[@id='chap_select']/option"))
                     chapterTitles.Add(node.NextSibling.InnerText);
             //Generates array of chapter titles.
+
+            if (storyURL.Contains("fanfiction.net"))
+                storyBody = "(//*[contains(@id, 'storytext')])";
+            else
+                storyBody = "(//*[contains(@id, 'storytextp')])";
         }
 
-        private void CreateStoryHeader(HtmlAgilityPack.HtmlDocument doc)
+        private void GrabStoryVariablesTTHFanfic(HtmlAgilityPack.HtmlDocument doc)
+        {
+            try { storyChapters = (ushort)(doc.DocumentNode.SelectNodes("//select[@id='chapnav']/option").Count()); }
+            catch { storyChapters = 1; }
+            //Checks for chapter dropdown, sets to 1 if not present.
+            
+            storyTitle = doc.DocumentNode.SelectSingleNode("//h2").InnerText;
+            authorName = doc.DocumentNode.SelectSingleNode("//a[contains(@href, 'AuthorStories')]").InnerText;
+            authorLink = doc.DocumentNode.SelectSingleNode("//a[contains(@href, 'AuthorStories')]").OuterHtml;
+            authorLink = authorLink.Insert(9, "http://www.tthfanfic.org");
+            try { storySummary = doc.DocumentNode.SelectSingleNode("//div[@class='storysummary formbody defaultcolors']/p[2]").InnerText; }
+            catch { storySummary = doc.DocumentNode.SelectSingleNode("//div[@class='storysummary formbody defaultcolors']/p[1]").InnerText; }
+            storySummary = storySummary.Remove(0, 9);
+            storyWords = "Words: " + doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[5]").InnerText;
+            storyPublished = "Published: " + doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[9]").InnerText;
+            storyUpdated = "Updated: " + doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[10]").InnerText;
+
+            if (doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[11]").InnerText == "Yes")
+                storyStatus = "Complete";
+            else
+                storyStatus = "In Progress";
+
+            if (storyChapters > 1)
+                foreach (HtmlNode node in doc.DocumentNode.SelectNodes("//select[@id='chapnav']/option"))
+                    chapterTitles.Add(node.NextSibling.InnerText);
+
+            storyBody = "(//*[contains(@id, 'storyinnerbody')])";
+        }
+
+        private void CreateStoryHeader()
         {//Builds story header using previously fetched variables, sets up formatting.
             storyInfo.AppendLine("<html><body><meta http-equiv=\"content-type\" content=\"text/html;charset=UTF-8\" />");
             storyInfo.AppendLine("Title: " + storyTitle);
-            storyInfo.AppendLine("<br />Author: " + doc.DocumentNode.SelectSingleNode("//a[contains(@href, '/u/')]").OuterHtml);
+            storyInfo.AppendLine("<br />Author: " + authorLink);
             storyInfo.AppendLine("<br />Chapters: " + storyChapters.ToString());
-            storyInfo.AppendLine("<br />Story " + storyWords);
-            storyInfo.Append("<br />" + storyPublished);
-            if (storyUpdated != "")
+            if (storyWords != null)
+                storyInfo.AppendLine("<br />Story " + storyWords);
+            if (storyPublished != null)
+                storyInfo.Append("<br />" + storyPublished);
+            if (storyUpdated != null)
                 storyInfo.AppendLine("<br />Last " + storyUpdated);
-            storyInfo.AppendLine("<br />Story Status: " + storyStatus);
-            storyInfo.AppendLine("<br /><br />Summary: " + doc.DocumentNode.SelectSingleNode("//div[@style='margin-top:2px']").InnerText);
+            if (storyStatus != null)
+                storyInfo.AppendLine("<br />Story Status: " + storyStatus);
+            if (storySummary != null)
+                storyInfo.AppendLine("<br /><br />Summary: " + storySummary);
             storyInfo.AppendLine("<br /><br /><br />");
         }
 
@@ -174,11 +224,7 @@ namespace fBook
 
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(htmlContent);
-            if (address.Contains("fanfiction.net"))
-                return doc.DocumentNode.SelectSingleNode("//*[contains(@id, 'storytext')]").InnerHtml;
-            else
-                return doc.DocumentNode.SelectSingleNode("//*[contains(@id, 'storytextp')]").InnerHtml;
-            //Differentiates between location of chapter content for FF.net FictionPress.com.
+            return (doc.DocumentNode.SelectSingleNode(storyBody).InnerHtml);
         }
 
         public ushort GetChapterCount()
