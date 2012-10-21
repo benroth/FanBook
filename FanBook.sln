@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2012
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "fBook", "fBook\fBook.csproj", "{726383A2-3B05-42E0-9C65-C797388E8547}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FanBook", "fBook\FanBook.csproj", "{726383A2-3B05-42E0-9C65-C797388E8547}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,4 +1,4 @@
-﻿//fBook by Ben Roth
+﻿//FanBook by Ben Roth
 //This program takes a URL for Fanfiction.net or FictionPress.com stories, then compiles the story info
 //and all the story storyChapters into a single, well-formated HTML document. This is useful for achival purposes
 //in case of those stories being pulled off the site or the site going down, but also useful if the user
@@ -9,7 +9,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace fBook
+namespace FanBook
 {
     static class Program
     {

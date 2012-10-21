@@ -1,4 +1,4 @@
-﻿namespace fBook
+﻿namespace FanBook
 {
     partial class form1
     {
@@ -28,7 +28,7 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.addressBar = new System.Windows.Forms.TextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
             this.button1 = new System.Windows.Forms.Button();
@@ -40,13 +40,13 @@
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.SuspendLayout();
             // 
-            // textBox1
+            // addressBar
             // 
-            this.textBox1.Location = new System.Drawing.Point(77, 12);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(487, 20);
-            this.textBox1.TabIndex = 0;
-            this.textBox1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
+            this.addressBar.Location = new System.Drawing.Point(77, 12);
+            this.addressBar.Name = "addressBar";
+            this.addressBar.Size = new System.Drawing.Size(487, 20);
+            this.addressBar.TabIndex = 0;
+            this.addressBar.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.textBox1_KeyPress);
             // 
             // label1
             // 
@@ -74,7 +74,7 @@
             this.button1.TabIndex = 4;
             this.button1.Text = "Get Info";
             this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            this.button1.Click += new System.EventHandler(this.btnGetInfo);
             // 
             // webBrowser1
             // 
@@ -139,9 +139,9 @@
             this.Controls.Add(this.button1);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.addressBar);
             this.Name = "form1";
-            this.Text = "fBook";
+            this.Text = "FanBook";
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -149,7 +149,7 @@
 
         #endregion
 
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox addressBar;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Button button1;

@@ -9,33 +9,48 @@ using System.Windows.Forms;
 using System.IO;
 using System.Threading;
 
-namespace fBook
+namespace FanBook
 {
     public partial class form1 : Form
     {
-        FanBook myBook = new FanBook();
+        private FanBook myBook;
+
+        private void CreateBook()
+        {
+            addressBar.Text.ToLower();
+            if (addressBar.Text.Contains("fanfiction.net"))
+                myBook = new FFNetBook();
+            else if (addressBar.Text.Contains("fictionpress.com"))
+                myBook = new FictionPressBook();
+            else if (addressBar.Text.Contains("fanficauthors"))
+                myBook = new FanFicAuthorsBook();
+            else if (addressBar.Text.Contains("tthfanfic.org"))
+                myBook = new TTHFanficBook();
+            else
+                webBrowser1.DocumentText = "Invalid URL! Please enter a story URL for a valid archive.";
+        }
 
         public form1()
         {
             InitializeComponent();
         }
         
-        private void button1_Click(object sender, EventArgs e)
+        private void btnGetInfo(object sender, EventArgs e)
         {//Tests URL for validity and starts download of story with story info generation.
             string testResults;
 
+            CreateBook();
             if (webBrowser1.DocumentText != "")
                 ResetFormVariables();
             myBook.InitStoryVariables();
             //Resets form and myBook variables.
-
-            testResults = myBook.TestURLFormat(textBox1.Text);
+            testResults = myBook.TestURLFormat(addressBar.Text);
             if (testResults.Contains("Invalid URL!"))
             { webBrowser1.DocumentText = testResults; }
             else
             { 
                 testResults = myBook.TestURLDownload();
-                if (testResults.Contains("Unable"))
+                if (testResults != "Download test passed.")
                     webBrowser1.DocumentText = testResults; //Tests to make sure URL is valid and reachable.
                 else
                 {//Sets story info to window and gives option to download.
@@ -67,7 +82,7 @@ namespace fBook
         private void textBox1_KeyPress(object sender, KeyPressEventArgs e)
         {//Monitors URL field for enter key press, and if pressed, triggers Get Info button.
             if (e.KeyChar == 13)
-                if (!textBox1.AcceptsReturn)
+                if (!addressBar.AcceptsReturn)
                     button1.PerformClick();
         }
 
@@ -81,7 +96,7 @@ namespace fBook
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {//Download chapters and pass progress to updater.           
             int chapters = (int)myBook.GetChapterCount();
-            for (int i = 1; i <= 100; i++)
+            for (int i = 1; i <= chapters; i++)
             {
                 myBook.DownloadStory(i-1);
                 backgroundWorker1.ReportProgress(i);               
