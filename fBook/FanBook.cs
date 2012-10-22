@@ -25,8 +25,8 @@ namespace FanBook
 
         public virtual string TestURLDownload()
         { return ""; }
-        public virtual void GrabStoryVariables(HtmlAgilityPack.HtmlDocument doc)
-        { }
+        public virtual string GrabStoryVariables(HtmlAgilityPack.HtmlDocument doc)
+        { return ""; }
         public virtual string getChapter(string address)
         { return ""; }
         public virtual void DownloadStory(int i)
@@ -63,16 +63,18 @@ namespace FanBook
             }
             if (!storyURL.Contains("fanfiction.net") && !storyURL.Contains("fictionpress.com") && !storyURL.Contains("tthfanfic.org") && !storyURL.Contains("fanficauthors.net"))
             {
-                return "Invalid URL! Please enter URLs for fanfiction.net or fictionpress.com stories only.";
+                return "Invalid URL! Please enter URLs for supported story archives only.";
             }
             return "Valid URL.";
         }        
 
-        protected string grabHtml(string address)
+        protected string grabHtml(string address, string cookie = "")
         {//Grabs HTML from provided address, or returns blank string in case of failure.
             try
             {//Tries downloading story using default IE proxy settings.
                 WebClient client = new WebClient();
+                if (cookie != "")
+                    client.Headers.Add(HttpRequestHeader.Cookie, "passhash=1f504b24e7c096a5b04ac0b7da44afc5");
                 Stream data = client.OpenRead(new Uri(address));
                 StreamReader reader = new StreamReader(data, Encoding.GetEncoding("UTF-8"));
                 string htmlContent = reader.ReadToEnd();
@@ -94,7 +96,7 @@ namespace FanBook
                     return htmlContent;
                 }
                 catch //If both failed, report connection error.
-                { return "Unable to download story! Please check connection to site."; }
+                { return "Unable to download story! Please check connection to site and verify URL points to a story."; }
             }
         }
 
@@ -102,7 +104,9 @@ namespace FanBook
         { //Downloads first chapter to get story info.
             var doc = new HtmlAgilityPack.HtmlDocument();
             doc.LoadHtml(grabHtml(storyURL));
-            GrabStoryVariables(doc);
+            string success = GrabStoryVariables(doc);
+              if (!success.Contains("Story grab success."))
+                  return success;
             CreateStoryHeader();
             return storyInfo.ToString();
         }           

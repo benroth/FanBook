@@ -9,56 +9,62 @@ namespace FanBook
 {
     class TTHFanficBook : FanBook
     {
-        public override void GrabStoryVariables(HtmlAgilityPack.HtmlDocument doc)
+        public override string GrabStoryVariables(HtmlAgilityPack.HtmlDocument doc)
         {
             dateFormat = "d MMM yy";
+            try
+            {
+                try { storyChapters = (ushort)(doc.DocumentNode.SelectNodes("//select[@id='chapnav']/option").Count()); }
+                catch { storyChapters = 1; }
+                //Checks for chapter dropdown, sets to 1 if not present.
 
-            try { storyChapters = (ushort)(doc.DocumentNode.SelectNodes("//select[@id='chapnav']/option").Count()); }
-            catch { storyChapters = 1; }
-            //Checks for chapter dropdown, sets to 1 if not present.
+                storyTitle = doc.DocumentNode.SelectSingleNode("//h2").InnerText;
+                authorName = doc.DocumentNode.SelectSingleNode("//a[contains(@href, 'AuthorStories')]").InnerText;
+                //Grabs title and name.
 
-            storyTitle = doc.DocumentNode.SelectSingleNode("//h2").InnerText;
-            authorName = doc.DocumentNode.SelectSingleNode("//a[contains(@href, 'AuthorStories')]").InnerText;
-            //Grabs title and name.
+                authorLink = doc.DocumentNode.SelectSingleNode("//a[contains(@href, 'AuthorStories')]").Attributes["href"].Value;
+                authorLink = authorLink.Insert(0, "<a href='http://www.tthfanfic.org");
+                authorLink = authorLink + "'>" + authorName + "</a>";
+                //Creates author link.
 
-            authorLink = doc.DocumentNode.SelectSingleNode("//a[contains(@href, 'AuthorStories')]").Attributes["href"].Value;
-            authorLink = authorLink.Insert(0, "<a href='http://www.tthfanfic.org");
-            authorLink = authorLink + "'>" + authorName + "</a>";
-            //Creates author link.
+                try { storySummary = doc.DocumentNode.SelectSingleNode("//div[@class='storysummary formbody defaultcolors']/p[2]").InnerText; }
+                catch { storySummary = doc.DocumentNode.SelectSingleNode("//div[@class='storysummary formbody defaultcolors']/p[1]").InnerText; }
+                storySummary = storySummary.Remove(0, 9);
+                //If story is part of series, 2nd paragraph is summary, if not, 1st is. Remove built-in "Summary: ".
 
-            try { storySummary = doc.DocumentNode.SelectSingleNode("//div[@class='storysummary formbody defaultcolors']/p[2]").InnerText; }
-            catch { storySummary = doc.DocumentNode.SelectSingleNode("//div[@class='storysummary formbody defaultcolors']/p[1]").InnerText; }
-            storySummary = storySummary.Remove(0, 9);
-            //If story is part of series, 2nd paragraph is summary, if not, 1st is. Remove built-in "Summary: ".
+                storyWords = doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[5]").InnerText;
 
-            storyWords = doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[5]").InnerText;
+                dt = DateTime.ParseExact(doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[9]").InnerHtml.Replace("&nbsp;", " ")
+                    , dateFormat, CultureInfo.InvariantCulture);
+                storyPublished = "Published: " + dt.ToString("d");
+                //Grab table section with publish date, strip formatting, read it in as US-format date.
 
-            dt = DateTime.ParseExact(doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[9]").InnerHtml.Replace("&nbsp;", " ")
-                , dateFormat, CultureInfo.InvariantCulture);
-            storyPublished = "Published: " + dt.ToString("d");
-            //Grab table section with publish date, strip formatting, read it in as US-format date.
+                dt = DateTime.ParseExact(doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[10]").InnerHtml.Replace("&nbsp;", " ")
+                    , dateFormat, CultureInfo.InvariantCulture);
+                storyUpdated = "Updated: " + dt.ToString("d");
+                //Same with update date.
 
-            dt = DateTime.ParseExact(doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[10]").InnerHtml.Replace("&nbsp;", " ")
-                , dateFormat, CultureInfo.InvariantCulture);
-            storyUpdated = "Updated: " + dt.ToString("d");
-            //Same with update date.
+                if (doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[11]").InnerText.Contains("Yes"))
+                    storyStatus = "Complete";
+                else
+                    storyStatus = "In Progress";
+                //Check for completion status.
 
-            if (doc.DocumentNode.SelectSingleNode("//table[@class='verticaltable']/tr[2]/td[11]").InnerText.Contains("Yes"))
-                storyStatus = "Complete";
-            else
-                storyStatus = "In Progress";
-            //Check for completion status.
+                if (storyChapters > 1)
+                    foreach (HtmlNode node in doc.DocumentNode.SelectNodes("//select[@id='chapnav']/option"))
+                    {
+                        string title = node.NextSibling.InnerText;
+                        chapterTitles.Add(title.Substring(title.IndexOf(" ")));
+                    }
+                //Grab chapter titles.
+                //*[@id="storyinnerbody"]
+                storyBody = "(//*[@id='storyinnerbody'])";
+                //Set path to story body for later extraction.
 
-            if (storyChapters > 1)
-                foreach (HtmlNode node in doc.DocumentNode.SelectNodes("//select[@id='chapnav']/option"))
-                {
-                    string title = node.NextSibling.InnerText;
-                    chapterTitles.Add(title.Substring(title.IndexOf(" ")));
-                }
-            //Grab chapter titles.
-            //*[@id="storyinnerbody"]
-            storyBody = "(//*[@id='storyinnerbody'])";
-            //Set path to story body for later extraction.
+                return "Story grab success.";
+            }
+            catch
+            { return "Story grab failed! Please verify URL provided is for a story."; }
         }
 
         public override void DownloadStory(int i)

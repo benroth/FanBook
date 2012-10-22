@@ -1,0 +1,1 @@
+Add support for grabbing content from foreign-language stories for sites that support it.

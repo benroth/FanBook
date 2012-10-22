@@ -18,16 +18,14 @@ namespace FanBook
         private void CreateBook()
         {
             addressBar.Text.ToLower();
-            if (addressBar.Text.Contains("fanfiction.net"))
+            if (addressBar.Text.Contains("fanfiction.net/s/"))
                 myBook = new FFNetBook();
-            else if (addressBar.Text.Contains("fictionpress.com"))
+            else if (addressBar.Text.Contains("fictionpress.com/s/"))
                 myBook = new FictionPressBook();
             else if (addressBar.Text.Contains("fanficauthors"))
                 myBook = new FanFicAuthorsBook();
-            else if (addressBar.Text.Contains("tthfanfic.org"))
+            else if (addressBar.Text.Contains("tthfanfic.org/Story"))
                 myBook = new TTHFanficBook();
-            else
-                webBrowser1.DocumentText = "Invalid URL! Please enter a story URL for a valid archive.";
         }
 
         public form1()
@@ -39,11 +37,20 @@ namespace FanBook
         {//Tests URL for validity and starts download of story with story info generation.
             string testResults;
 
-            CreateBook();
+            CreateBook();                
+            if (myBook == null)
+            {
+                webBrowser1.DocumentText = "Invalid URL! Please enter a story URL for a supported archive.";
+                return;
+            }
+
             if (webBrowser1.DocumentText != "")
+            {
                 ResetFormVariables();
-            myBook.InitStoryVariables();
+                myBook.InitStoryVariables();
+            }
             //Resets form and myBook variables.
+
             testResults = myBook.TestURLFormat(addressBar.Text);
             if (testResults.Contains("Invalid URL!"))
             { webBrowser1.DocumentText = testResults; }
@@ -54,8 +61,9 @@ namespace FanBook
                     webBrowser1.DocumentText = testResults; //Tests to make sure URL is valid and reachable.
                 else
                 {//Sets story info to window and gives option to download.
-                    webBrowser1.DocumentText = myBook.GenerateStoryInfo();                    
-                    btnDownloadStory.Enabled = true;
+                    webBrowser1.DocumentText = myBook.GenerateStoryInfo();   
+                    if (!webBrowser1.DocumentText.Contains("Story grab failed!"))
+                        btnDownloadStory.Enabled = true;
                 }
             }
         }
@@ -89,7 +97,7 @@ namespace FanBook
         private void ResetFormVariables()
         {//Reset form to base values.
             lblProgressText.Text = null;
-            webBrowser1.DocumentText = null;
+            webBrowser1.DocumentText = "";
             btnSaveStory.Enabled = false;
         }
 

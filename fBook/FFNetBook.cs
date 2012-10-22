@@ -8,44 +8,50 @@ namespace FanBook
 {
     class FFNetBook : FanBook
     {
-        public override void GrabStoryVariables(HtmlAgilityPack.HtmlDocument doc)
+        public override string GrabStoryVariables(HtmlAgilityPack.HtmlDocument doc)
         {//Takes first chapter and fills story variables with its info.
-            try { storyChapters = (ushort)(doc.DocumentNode.SelectNodes("//select[@id='chap_select']/option").Count() / 2); }
-            catch { storyChapters = 1; }
-            //Checks for chapter selection dropdown. If not present, story is 1 chapter long.
+            try
+            {
+                try { storyChapters = (ushort)(doc.DocumentNode.SelectNodes("//select[@id='chap_select']/option").Count() / 2); }
+                catch { storyChapters = 1; }
+                //Checks for chapter selection dropdown. If not present, story is 1 chapter long.
 
-            storyTitle = doc.DocumentNode.SelectSingleNode("//tr[@class='alt2']//b").InnerText;
-            authorName = doc.DocumentNode.SelectSingleNode("//a[contains(@href, '/u/')]").InnerText;
-            authorLink = doc.DocumentNode.SelectSingleNode("//a[contains(@href, '/u/')]").OuterHtml;
-            authorLink = authorLink.Insert(9, "http://www.fanfiction.net");
-            storySummary = doc.DocumentNode.SelectSingleNode("//div[@style='margin-top:2px']").InnerText;
+                storyTitle = doc.DocumentNode.SelectSingleNode("//tr[@class='alt2']//b").InnerText;
+                authorName = doc.DocumentNode.SelectSingleNode("//a[contains(@href, '/u/')]").InnerText;
+                authorLink = doc.DocumentNode.SelectSingleNode("//a[contains(@href, '/u/')]").OuterHtml;
+                authorLink = authorLink.Insert(9, "http://www.fanfiction.net");
+                storySummary = doc.DocumentNode.SelectSingleNode("//div[@style='margin-top:2px']").InnerText;
 
-            string greyHeader = doc.DocumentNode.SelectSingleNode("//div[@style='color:gray;']").InnerText;
-            string[] splitHeader = greyHeader.Split(' ');
-            //Grabs individual variables from story, then splits header up for further parsing.
+                string greyHeader = doc.DocumentNode.SelectSingleNode("//div[@style='color:gray;']").InnerText;
+                string[] splitHeader = greyHeader.Split(' ');
+                //Grabs individual variables from story, then splits header up for further parsing.
 
-            for (int i = 0; i < splitHeader.Length; i++)
-            {//Looks for keywords in header, and if found, assigns them and following section to appropriate story variable.
-                if (splitHeader[i].Contains("Words:"))
-                    storyWords = splitHeader[i] + " " + splitHeader[i + 1];
-                else if (splitHeader[i].Contains("Published:"))
-                    storyPublished = splitHeader[i] + " " + splitHeader[i + 1];
-                else if (splitHeader[i].Contains("Updated:"))
-                    storyUpdated = splitHeader[i] + " " + splitHeader[i + 1];
+                for (int i = 0; i < splitHeader.Length; i++)
+                {//Looks for keywords in header, and if found, assigns them and following section to appropriate story variable.
+                    if (splitHeader[i].Contains("Words:"))
+                        storyWords = splitHeader[i] + " " + splitHeader[i + 1];
+                    else if (splitHeader[i].Contains("Published:"))
+                        storyPublished = splitHeader[i] + " " + splitHeader[i + 1];
+                    else if (splitHeader[i].Contains("Updated:"))
+                        storyUpdated = splitHeader[i] + " " + splitHeader[i + 1];
+                }
+
+                if (greyHeader.Contains("Complete"))
+                    storyStatus = "Complete";
+                else
+                    storyStatus = "In Progress";
+                //Checks header for whether story is complete.
+
+                if (storyChapters > 1)
+                    foreach (HtmlNode node in doc.DocumentNode.SelectNodes("//select[@id='chap_select']/option"))
+                        chapterTitles.Add(node.NextSibling.InnerText.Remove(0, node.NextSibling.InnerText.IndexOf(' ')));
+
+                //Generates array of chapter titles.
+                storyBody = "(//*[contains(@id, 'storytext')])";
+                return "Story grab success.";
             }
-
-            if (greyHeader.Contains("Complete"))
-                storyStatus = "Complete";
-            else
-                storyStatus = "In Progress";
-            //Checks header for whether story is complete.
-
-            if (storyChapters > 1)
-                foreach (HtmlNode node in doc.DocumentNode.SelectNodes("//select[@id='chap_select']/option"))
-                    chapterTitles.Add(node.NextSibling.InnerText.Remove(0, node.NextSibling.InnerText.IndexOf(' ')));
-
-            //Generates array of chapter titles.
-            storyBody = "(//*[contains(@id, 'storytext')])";
+            catch
+            { return "Story grab failed! Please verify URL provided is for a story."; }
         }
 
         public override void DownloadStory(int i)

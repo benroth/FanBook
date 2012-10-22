@@ -42,6 +42,8 @@
             // 
             // addressBar
             // 
+            this.addressBar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.addressBar.Location = new System.Drawing.Point(77, 12);
             this.addressBar.Name = "addressBar";
             this.addressBar.Size = new System.Drawing.Size(487, 20);
@@ -68,6 +70,7 @@
             // 
             // button1
             // 
+            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.button1.Location = new System.Drawing.Point(589, 12);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(54, 23);
@@ -78,6 +81,9 @@
             // 
             // webBrowser1
             // 
+            this.webBrowser1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.webBrowser1.Location = new System.Drawing.Point(15, 56);
             this.webBrowser1.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser1.Name = "webBrowser1";
@@ -86,6 +92,7 @@
             // 
             // btnDownloadStory
             // 
+            this.btnDownloadStory.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnDownloadStory.Enabled = false;
             this.btnDownloadStory.Location = new System.Drawing.Point(15, 545);
             this.btnDownloadStory.Name = "btnDownloadStory";
@@ -97,6 +104,7 @@
             // 
             // lblProgressText
             // 
+            this.lblProgressText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.lblProgressText.AutoSize = true;
             this.lblProgressText.Location = new System.Drawing.Point(494, 550);
             this.lblProgressText.Name = "lblProgressText";
@@ -111,6 +119,7 @@
             // 
             // btnSaveStory
             // 
+            this.btnSaveStory.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.btnSaveStory.Enabled = false;
             this.btnSaveStory.Location = new System.Drawing.Point(256, 545);
             this.btnSaveStory.Name = "btnSaveStory";
@@ -140,6 +149,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.addressBar);
+            this.MinimumSize = new System.Drawing.Size(400, 400);
             this.Name = "form1";
             this.Text = "FanBook";
             this.ResumeLayout(false);
